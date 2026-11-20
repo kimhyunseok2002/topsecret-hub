@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EDF-X5 Sport Jet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Spec sheet and interactive 3D model of the EDF-X5, a 3D-printed sport jet with one 50 mm ducted fan, a chin inlet and a swept wing, designed in Fusion 360 by Claude.">
+<meta name="theme-color" content="#000000">
+<meta property="og:type" content="website">
+<meta property="og:title" content="EDF-X5 Sport Jet">
+<meta property="og:description" content="Spec sheet and interactive 3D model of the EDF-X5, a 3D-printed sport jet with one 50 mm ducted fan, a chin inlet and a swept wing, designed in Fusion 360 by Claude.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M16 3l3 11 10 6v2l-10-2-1 6 3 2v1l-5-1-5 1v-1l3-2-1-6-10 2v-2l10-6z' fill='%23e7e9ec'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* EDF-X5 sheet, built from the B-2 sheet (webtools/build_site.py); same layout as the SPEED-QUAD TS5 sheet: black model bay first, then a numbered technical data sheet;
+   brand stamp + Instagram in the masthead and footer. Single dark look by request. */
+:root {
+  color-scheme: dark;
+  --bg: #000000;
+  --fg: #e7e9ec;
+  --muted: #8c929b;
+  --faint: #5b6068;
+  --line: #1c1f24;
+  --line2: #2c3037;
+  --accent: #d0142c;          /* brand stamp red */
+  --accent-ink: #ff4458;
+  --gold: #c9a24a;            /* the B-2's gold-tinted canopy coating */
+  --c-airframe: #8b9099;
+  --c-battery: #dcae22;
+  --c-edf: #c3122a;
+  --c-avionics: #2f8f4e;
+  --c-esc: #2a6ad0;
+  --c-carbon: #3e4147;
+  --c-gear: #d9dbde;
+  --c-servo: #5d626b;
+  --c-wiring: #6b7078;
+  --c-bay: #34373d;
+  --flow: #7fdcff;
+  --display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.55; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); }
+[hidden] { display: none !important; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+.wrap {
+  max-width: 1120px; margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- masthead */
+.masthead { padding-block: 28px 18px; display: grid; gap: 14px; }
+.brandrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.stamp {
+  display: inline-block; font-family: var(--mono); font-weight: 500; font-size: 11px;
+  letter-spacing: .24em; text-transform: uppercase; color: var(--accent-ink);
+  border: 1.5px solid var(--accent); padding: 5px 9px 4px; transform: rotate(-2deg);
+}
+.ig { font-family: var(--mono); font-size: 13px; color: var(--muted); text-decoration: none; display: inline-flex; gap: 8px; align-items: baseline; }
+.ig b { color: var(--fg); font-weight: 500; }
+.ig:hover b { text-decoration: underline; text-underline-offset: 3px; }
+h1 {
+  font-family: var(--display); font-stretch: 125%; font-weight: 800;
+  font-size: clamp(40px, 8.4vw, 92px); line-height: .92; letter-spacing: -.01em;
+  margin: 6px 0 0; text-wrap: balance;
+}
+h1 .scale { color: var(--muted); font-weight: 500; }
+.lede { max-width: 62ch; color: var(--muted); font-size: 16px; margin: 0; }
+.status { font-family: var(--mono); font-size: 12px; color: var(--faint); letter-spacing: .04em; margin: 0; }
+
+/* ---------- model bay */
+.bay { border-block: 1px solid var(--line); }
+.viewer { position: relative; height: clamp(360px, 64vh, 720px); background: var(--bg); overflow: hidden; }
+.viewer canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.viewer canvas:active { cursor: grabbing; }
+.loading {
+  position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+  font-family: var(--mono); font-size: 13px; color: var(--muted); padding-inline: 24px;
+}
+.hud {
+  position: absolute; left: max(16px, env(safe-area-inset-left, 0px)); bottom: 14px;
+  max-width: calc(100% - 32px); display: grid; gap: 2px; pointer-events: none;
+  font-family: var(--mono); font-size: 12px;
+}
+.hud b { font-weight: 500; color: var(--fg); letter-spacing: .06em; text-transform: uppercase; }
+.hud span { color: var(--muted); }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-block: 12px; }
+.toolbar button {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--fg); background: var(--bg); border: 1px solid var(--line2); border-radius: 2px;
+  padding: 8px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+}
+.toolbar button:hover { border-color: var(--muted); }
+.toolbar button[aria-pressed]::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--faint);
+}
+.toolbar button[aria-pressed="true"] { border-color: var(--accent); }
+.toolbar button[aria-pressed="true"]::before { background: var(--accent-ink); border-color: var(--accent-ink); }
+.hint { font-family: var(--mono); font-size: 12px; color: var(--faint); margin-left: auto; }
+
+/* ---------- key figures */
+.figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding-block: 26px 8px; }
+.fig { padding: 4px 18px 4px 0; border-left: 1px solid var(--line2); padding-left: 16px; display: grid; gap: 4px; }
+.fig:first-child { border-left: 0; padding-left: 0; }
+.fig .k { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.fig .v { font-family: var(--display); font-stretch: 112%; font-weight: 700; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.05; font-variant-numeric: tabular-nums; }
+.fig .v small { font-family: var(--mono); font-weight: 400; font-size: 14px; color: var(--muted); margin-left: 4px; }
+.fig .s { font-family: var(--mono); font-size: 11.5px; color: var(--faint); }
+
+/* ---------- airflow tag */
+.flowtag {
+  position: absolute; top: 12px; left: max(16px, env(safe-area-inset-left, 0px));
+  display: flex; align-items: center; gap: 8px; pointer-events: none;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--flow);
+}
+.flowtag::before { content: ""; width: 18px; height: 2px; background: linear-gradient(90deg, transparent, var(--flow)); }
+
+/* ---------- section nav */
+.secnav {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; border-block: 1px solid var(--line);
+  background: rgba(0, 0, 0, .86); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.secnav-in { position: relative; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-block: 10px; }
+.secnav-in::-webkit-scrollbar { display: none; }
+.secnav a {
+  flex: none; font-family: var(--mono); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--muted); text-decoration: none; padding: 7px 12px; border: 1px solid var(--line2); border-radius: 999px;
+  transition: color .15s, border-color .15s, background-color .15s;
+}
+.secnav a .no { color: var(--faint); margin-right: 6px; }
+.secnav a:hover { color: var(--fg); border-color: var(--muted); }
+.secnav a[aria-current="location"] { color: var(--fg); border-color: var(--accent); background: rgba(208, 20, 44, .14); }
+.secnav a[aria-current="location"] .no { color: var(--accent-ink); }
+
+/* ---------- data sheet */
+.sheet { padding-block: 0 16px; }
+.sec {
+  display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 16px 44px;
+  padding-block: 38px 42px; border-top: 1px solid var(--line); scroll-margin-top: 56px;
+}
+.sec:first-child { border-top: 0; }
+.sec-h { position: sticky; top: 80px; align-self: start; display: grid; gap: 8px; justify-items: start; }
+.sec-h .no { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; color: var(--accent-ink); }
+h2 {
+  font-family: var(--display); font-stretch: 125%; font-weight: 700; font-size: 17px; line-height: 1.25;
+  letter-spacing: .06em; text-transform: uppercase; margin: 0; color: var(--fg);
+}
+.tag {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .06em; color: var(--muted);
+  border: 1px solid var(--line2); border-radius: 999px; padding: 2px 9px;
+}
+.sec-b { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; align-content: start; }
+
+.items { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 0 32px; }
+.items.c2 { --cols: 2; }
+.items.c4 { --cols: 4; }
+.item.span2 { grid-column: span 2; }
+.item { border-top: 1px solid var(--line2); padding: 14px 0 16px; display: grid; gap: 5px; align-content: start; min-width: 0; }
+.item.wide { grid-column: 1 / -1; }
+.item .k { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.item .v {
+  font-family: var(--display); font-stretch: 106%; font-weight: 700; font-size: 22px; line-height: 1.2;
+  font-variant-numeric: tabular-nums; color: var(--fg); overflow-wrap: anywhere;
+}
+.item .v small { font-family: var(--mono); font-weight: 400; font-size: 13px; letter-spacing: 0; color: var(--muted); margin-left: 4px; }
+.item .d { font-size: 14px; line-height: 1.5; color: var(--muted); }
+.n { font-family: var(--mono); font-size: .95em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.note { color: var(--muted); font-size: 13.5px; margin: 0; max-width: 70ch; padding-left: 12px; border-left: 2px solid var(--line2); }
+
+.panel { border: 1px solid var(--line2); border-radius: 4px; padding: 18px; background: #060708; min-width: 0; }
+.panel-h { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.panel .items { margin-top: 4px; }
+
+/* front view of the centre body, seen from the nose */
+.frontview { margin: 0; display: grid; gap: 14px; }
+.frontview .svgbox { overflow-x: auto; }
+.frontview svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.frontview figcaption p { margin: 0 0 8px; }
+.frontview figcaption p:not(.panel-h) { font-size: 14.5px; }
+.frontview figcaption p.d { color: var(--muted); font-size: 13.5px; margin: 0; }
+.fv-body { fill: #2a2e34; stroke: #4a4f57; stroke-width: 0.8; }
+.fv-fan { fill: rgba(195, 18, 42, .16); }
+.fv-blade { fill: none; stroke: rgba(255, 120, 135, .55); stroke-width: 1.3; stroke-linecap: round; }
+.fv-edf { fill: none; stroke: var(--c-edf); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.fv-hub { fill: #111214; stroke: var(--muted); stroke-width: 0.8; }
+.fv-arc { fill: none; stroke: var(--accent-ink); stroke-width: 2.4; stroke-linecap: round; }
+.fv-head { fill: var(--accent-ink); }
+.fv-rot { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; fill: var(--fg); }
+.fv-dim { font-family: var(--mono); font-size: 10px; fill: var(--muted); }
+.fv-axis { fill: none; stroke: var(--faint); stroke-width: 1; stroke-dasharray: 2 3; }
+.fv-lead { fill: none; stroke: var(--faint); stroke-width: 1; }
+.fv-z0 { fill: none; stroke: var(--faint); stroke-width: 1; stroke-dasharray: 1 3; }
+.fv-dimline { fill: none; stroke: var(--muted); stroke-width: 1; }
+
+/* air path */
+.steps { margin: 16px 0 0; padding: 0; list-style: none; counter-reset: s; display: grid; }
+.steps li { counter-increment: s; position: relative; padding: 1px 0 14px 36px; font-size: 14.5px; line-height: 1.5; }
+.steps li:last-child { padding-bottom: 0; }
+.steps li::before {
+  content: counter(s); position: absolute; left: 0; top: 0; width: 22px; height: 22px; border-radius: 50%;
+  display: grid; place-items: center; font-family: var(--mono); font-size: 11px; color: var(--accent-ink);
+  border: 1px solid var(--accent); background: var(--bg); z-index: 1;
+}
+.steps li::after { content: ""; position: absolute; left: 11px; top: 22px; bottom: 0; width: 1px; background: var(--line2); }
+.steps li:last-child::after { display: none; }
+
+/* bars */
+.bars { margin: 0; padding: 0; list-style: none; display: grid; gap: 9px; }
+.bars li { display: grid; grid-template-columns: minmax(120px, 36%) minmax(0, 1fr) 64px; align-items: center; gap: 12px; font-size: 14px; }
+.bars .lbl { color: var(--muted); }
+.bars .track { height: 8px; background: var(--line); position: relative; border-radius: 1px; }
+.bars .fill { position: absolute; inset: 0 auto 0 0; border-radius: 1px; }
+.bars .val { font-family: var(--mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+.bars--gap .track { height: 6px; }
+.bars--gap .fill { background: #8d939c; }
+.total { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--line2); }
+.total span { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.total b { font-family: var(--display); font-stretch: 112%; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
+
+/* station map */
+.station { margin: 0; min-width: 0; }
+.station figcaption { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.station .svgbox { overflow-x: auto; }
+.station svg { display: block; width: 100%; height: auto; min-width: 600px; }
+.st-plan { fill: #1a1d21; stroke: #5b6068; stroke-width: 1; }
+.st-surf { fill: #2a2e34; stroke: #5b6068; stroke-width: .8; }
+.st-joint { fill: none; stroke: #4a4f57; stroke-width: 1; stroke-dasharray: 3 3; }
+.st-spar { fill: none; stroke: #7d838c; stroke-linecap: round; }
+.st-bay { fill: var(--c-bay); }
+.st-bat { fill: var(--c-battery); }
+.st-fc { fill: var(--c-avionics); }
+.st-gps { fill: #e7e9ec; }
+.st-esc { fill: var(--c-esc); }
+.st-intake { fill: #000; stroke: #5b6068; stroke-width: .8; }
+.st-duct { fill: none; stroke: #6b7078; stroke-width: .8; stroke-dasharray: 2 2; }
+.st-edf { fill: var(--c-edf); }
+.st-tube { fill: #6e2230; }
+.st-tray { fill: #6d6a64; }
+.st-servo { fill: var(--c-servo); }
+.st-gear { fill: var(--c-gear); }
+.st-in-dark { font-family: var(--mono); font-size: 9px; font-weight: 500; fill: #000; }
+.st-cgline { fill: none; stroke: var(--accent-ink); stroke-width: 1; stroke-dasharray: 3 3; }
+.st-mark { fill: none; stroke: var(--fg); stroke-width: 1; stroke-dasharray: 1 3; opacity: .7; }
+.st-cgbg { fill: var(--bg); stroke: var(--accent-ink); stroke-width: 1.2; }
+.st-cg { fill: var(--accent-ink); }
+.st-np { fill: var(--fg); }
+.st-lead { fill: none; stroke: var(--faint); stroke-width: .8; }
+.st-dot { fill: var(--fg); }
+.st-lbl { font-family: var(--mono); font-size: 10px; fill: var(--fg); }
+.st-lbl-cg { font-family: var(--mono); font-size: 10px; fill: var(--accent-ink); }
+.st-tick { fill: none; stroke: var(--faint); stroke-width: 1; }
+.st-scale { font-family: var(--mono); font-size: 9px; fill: var(--faint); }
+
+/* speed envelope */
+.gauge-track { position: relative; height: 12px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.gauge-fill { position: absolute; top: 0; bottom: 0; }
+.gauge-fill.env { left: 24.67%; width: 66.66%; background: linear-gradient(90deg, rgba(54, 200, 255, .25), rgba(54, 200, 255, .85)); }
+.gauge-fill.cruise { left: 40%; width: 13.33%; background: rgba(234, 250, 255, .9); }
+.gauge-scale { position: relative; height: 18px; margin-top: 6px; font-family: var(--mono); font-size: 11px; color: var(--faint); }
+.gauge-scale span { position: absolute; top: 0; transform: translateX(-50%); }
+.gauge-scale span:first-child { transform: none; }
+.gauge-scale .unit { right: 0; left: auto; transform: none; }
+.sw { display: inline-block; width: 10px; height: 10px; margin-right: 8px; vertical-align: -1px; border-radius: 1px; }
+.sw.env { background: rgba(54, 200, 255, .85); }
+.sw.cruise { background: rgba(234, 250, 255, .95); }
+
+/* to-do list */
+ul.todo { margin: 0; padding: 0; list-style: none; display: grid; }
+ul.todo li { border-top: 1px solid var(--line2); padding: 12px 0 12px 26px; position: relative; font-size: 15px; }
+ul.todo li::before { content: ""; position: absolute; left: 2px; top: 18px; width: 10px; height: 10px; border: 1px solid var(--muted); border-radius: 2px; }
+ul.todo li.done::before { background: var(--accent-ink); border-color: var(--accent-ink); }
+ul.todo li.done { color: var(--muted); }
+
+/* follow band */
+.cta { border-top: 1px solid var(--line); background: radial-gradient(120% 160% at 0% 0%, rgba(208, 20, 44, .18), transparent 55%), #050506; }
+.cta-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 28px; padding-block: 36px; }
+.cta p { margin: 0; font-size: 16px; color: var(--muted); max-width: 58ch; }
+.cta p b { color: var(--fg); font-weight: 600; }
+.cta-btn {
+  font-family: var(--mono); font-size: 13px; letter-spacing: .06em; text-decoration: none; white-space: nowrap;
+  color: #fff; background: var(--accent); border-radius: 2px; padding: 12px 18px;
+}
+.cta-btn:hover { background: #e3203a; }
+
+/* ---------- footer */
+footer { border-top: 1px solid var(--line); }
+.foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-block: 22px 30px; }
+.foot p { margin: 0; font-family: var(--mono); font-size: 12px; color: var(--faint); }
+
+@media (max-width: 1100px) {
+  .items.c4 { --cols: 2; }
+}
+@media (max-width: 860px) {
+  .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 18px; }
+  .fig:nth-child(3) { border-left: 0; padding-left: 0; }
+  .hint { margin-left: 0; width: 100%; }
+  .sec { grid-template-columns: minmax(0, 1fr); padding-block: 30px 34px; }
+  .sec-h { position: static; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+}
+@media (max-width: 560px) {
+  .viewer { height: clamp(300px, 52vh, 440px); }
+  .items, .items.c4 { --cols: 2; gap: 0 18px; }
+  .item .v { font-size: 19px; }
+  .item .d { font-size: 13.5px; }
+  .panel { padding: 14px; }
+  .bars li { grid-template-columns: minmax(0, 1fr) 64px; row-gap: 6px; }
+  .bars .track { grid-column: 1 / -1; order: 3; }
+  .cta-btn { flex: 1 1 100%; text-align: center; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+@media (prefers-reduced-motion: reduce) { .stamp { transform: none; } }
+</style>
+</head>
+<body>
+<header class="wrap masthead">
+  <div class="brandrow">
+    <span class="stamp">Top Secret Aero</span>
+    <a class="ig" href="https://www.instagram.com/topsecret.aero/" target="_blank" rel="noopener">Instagram <b>@topsecret.aero</b></a>
+  </div>
+  <h1>EDF-X5 <span class="scale">Sport Jet</span></h1>
+  <p class="lede">A 3D-printed sport jet built around one 50&nbsp;mm ducted fan on 6S. A chin inlet feeds an S-duct to the fan in the tail, and the swept wing splits into printable panels. Every part was modeled in Fusion 360 by Claude from a written brief.</p>
+  <p class="status">Design study · Fusion 360 · rev. v15 · split into 26 printed parts · not yet printed or flown</p>
+</header>
+
+<section class="bay" aria-label="3D model">
+  <div class="viewer" id="viewer">
+    <canvas id="scene" aria-label="Interactive 3D model of the EDF-X5 sport jet"></canvas>
+    <div class="loading" id="loading">Loading 3D model…</div>
+    <div class="hud" id="hud" hidden><b id="hud-t"></b><span id="hud-d"></span></div>
+    <div class="flowtag" id="flowtag" hidden>Airflow · modeled, not measured</div>
+  </div>
+  <div class="wrap toolbar" role="toolbar" aria-label="3D view controls">
+    <button id="btn-flow" type="button" aria-pressed="true">Airflow</button>
+    <button id="btn-xray" type="button" aria-pressed="false">X-ray</button>
+    <button id="btn-rotate" type="button" aria-pressed="true">Auto-rotate</button>
+    <button id="btn-reset" type="button">Reset view</button>
+    <span class="hint">Drag to orbit · scroll or pinch to zoom · point at a part for its name</span>
+  </div>
+</section>
+
+<section class="wrap figures" aria-label="Key figures">
+  <div class="fig"><span class="k">Span</span><span class="v">950<small>mm</small></span><span class="s">27° leading-edge sweep</span></div>
+  <div class="fig"><span class="k">Length</span><span class="v">1070<small>mm</small></span><span class="s">nose to rudder trailing edge</span></div>
+  <div class="fig"><span class="k">Power</span><span class="v">50<small>mm EDF</small></span><span class="s">XFly Galaxy X5 on 6S</span></div>
+  <div class="fig"><span class="k">All-up weight</span><span class="v">≈1380<small>g</small></span><span class="s">CAD audit · target 984 g</span></div>
+</section>
+
+<nav class="secnav" aria-label="Spec sheet sections">
+  <div class="wrap secnav-in">
+    <a href="#overview"><span class="no">01</span>Overview</a>
+    <a href="#wing"><span class="no">02</span>Wing &amp; tail</a>
+    <a href="#propulsion"><span class="no">03</span>Propulsion</a>
+    <a href="#mass"><span class="no">04</span>Mass</a>
+    <a href="#performance"><span class="no">05</span>Performance</a>
+    <a href="#printing"><span class="no">06</span>Printing</a>
+    <a href="#verification"><span class="no">07</span>CAD check</a>
+    <a href="#next"><span class="no">08</span>Next steps</a>
+  </div>
+</nav>
+
+<main class="wrap sheet">
+  <section class="sec" id="overview" aria-labelledby="h-overview">
+    <header class="sec-h"><span class="no">01</span><h2 id="h-overview">Overview</h2></header>
+    <div class="sec-b">
+      <div class="items c4">
+        <div class="item span2"><span class="k">Type</span><span class="v">Swept-wing sport jet</span><span class="d">Conventional tail, no flaps. One ducted fan buried in the rear fuselage, fed by a chin inlet under the nose.</span></div>
+        <div class="item span2"><span class="k">How it was made</span><span class="v">Claude in Fusion 360</span><span class="d">A Python build script run through Claude's Fusion 360 bridge creates the whole model in 23 phases, about 7 minutes, with checks after every phase.</span></div>
+        <div class="item"><span class="k">Fan</span><span class="v">XFly Galaxy X5</span><span class="d"><span class="n">50 mm</span>, 3200 KV on 6S, <span class="n">1240 gf</span> on the maker's bench</span></div>
+        <div class="item"><span class="k">Battery</span><span class="v">6S 1300<small>mAh</small></span><span class="d">At least 50C, on a rail that slides <span class="n">±50 mm</span> to set the CG</span></div>
+        <div class="item"><span class="k">Material</span><span class="v">PLA</span><span class="d">Plain PLA, <span class="n">0.55 mm</span> printed skin</span></div>
+        <div class="item"><span class="k">Status</span><span class="v">Design study</span><span class="d">Modeled and split for printing. Not yet printed or flown.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="wing" aria-labelledby="h-wing">
+    <header class="sec-h"><span class="no">02</span><h2 id="h-wing">Wing &amp; tail</h2></header>
+    <div class="sec-b">
+      <div class="items">
+        <div class="item"><span class="k">Wing area</span><span class="v">17.6<small>dm²</small></span><span class="d">Aspect ratio <span class="n">5.13</span>, taper <span class="n">0.45</span></span></div>
+        <div class="item"><span class="k">Chords</span><span class="v">255 → 115<small>mm</small></span><span class="d">Mean aero chord <span class="n">194 mm</span> at <span class="n">208 mm</span> span</span></div>
+        <div class="item"><span class="k">Sweep</span><span class="v">27°</span><span class="d">Leading edge; <span class="n">19.9°</span> at quarter chord</span></div>
+        <div class="item"><span class="k">Airfoil</span><span class="v">10% → 9%, 4% camber</span><span class="d">Cambered for a low stall speed without flaps, <span class="n">−2.5°</span> washout at the tips</span></div>
+        <div class="item"><span class="k">Tailplane</span><span class="v">V<sub>h</sub> 0.44</span><span class="d">Root chord <span class="n">148 mm</span>, tail arm <span class="n">387 mm</span></span></div>
+        <div class="item"><span class="k">Fin</span><span class="v">V<sub>v</sub> 0.050</span><span class="d">Root chord <span class="n">163 mm</span>, tail arm <span class="n">394 mm</span></span></div>
+      </div>
+      <p class="note">Controls are ailerons, elevators and a rudder on 15 nylon hinges, driven by 4 servos. No flaps: a cambered airfoil gets most of the low-speed lift without a second pair of moving surfaces.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="propulsion" aria-labelledby="h-propulsion">
+    <header class="sec-h"><span class="no">03</span><h2 id="h-propulsion">Propulsion &amp; airflow</h2></header>
+    <div class="sec-b">
+      <div class="items c4">
+        <div class="item"><span class="k">Inlet</span><span class="v">Chin</span><span class="d">Lip at <span class="n">192 mm</span> from the nose, <span class="n">102%</span> of the fan's swept area</span></div>
+        <div class="item"><span class="k">Duct</span><span class="v">S-duct</span><span class="d">Rises from the chin to the fan axis at only <span class="n">3.7°</span>, so the flow stays attached</span></div>
+        <div class="item"><span class="k">Nozzle</span><span class="v">91%<small>FSA</small></span><span class="d">Exit at <span class="n">1046 mm</span>, printed as its own part</span></div>
+        <div class="item"><span class="k">Installed thrust</span><span class="v">≈931<small>gf</small></span><span class="d">Bench figure corrected for pack voltage sag under <span class="n">38 A</span> and duct losses</span></div>
+      </div>
+      <p class="note">Why a chin inlet: side inlets had no room for a gentle S-bend, and a nose inlet would have taken the space the battery needs to balance the aircraft. In the 3D view, the lines through the fuselage show air entering the chin inlet, turning up through the duct, swirling through the fan and leaving as a fast jet. Turn on <b>X-ray</b> to see them inside.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="mass" aria-labelledby="h-mass">
+    <header class="sec-h"><span class="no">04</span><h2 id="h-mass">Mass</h2><span class="tag">CAD audit</span></header>
+    <div class="sec-b">
+      <div class="panel">
+        <div class="total"><span>All-up weight, measured from the model</span><b>≈1380 g</b></div>
+        <ul class="bars">
+          <li><span class="lbl">Printed parts</span><span class="track"><span class="fill" style="width:59.2%;background:var(--c-airframe)"></span></span><span class="val">817 g</span></li>
+          <li><span class="lbl">Battery, 6S 1300</span><span class="track"><span class="fill" style="width:15.6%;background:var(--c-battery)"></span></span><span class="val">215 g</span></li>
+          <li><span class="lbl">Fan, ESC, servos, radio</span><span class="track"><span class="fill" style="width:12.7%;background:var(--c-esc)"></span></span><span class="val">177 g</span></li>
+          <li><span class="lbl">Spars, hinges, linkages, joints</span><span class="track"><span class="fill" style="width:6.0%;background:var(--c-carbon)"></span></span><span class="val">83 g</span></li>
+          <li><span class="lbl">Landing gear</span><span class="track"><span class="fill" style="width:4.3%;background:var(--c-gear)"></span></span><span class="val">60 g</span></li>
+          <li><span class="lbl">Wiring and connectors</span><span class="track"><span class="fill" style="width:2.0%;background:var(--c-wiring)"></span></span><span class="val">28 g</span></li>
+        </ul>
+      </div>
+      <p class="note"><b>Over target by 40%.</b> The design aimed at <span class="n">984 g</span>. Weighing every printed part from its real volume in the model gives <span class="n">≈1380 g</span>: the wing alone is <span class="n">353 g</span> and the fuselage shell <span class="n">301 g</span>. Getting the weight down is the first job before printing.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="performance" aria-labelledby="h-performance">
+    <header class="sec-h"><span class="no">05</span><h2 id="h-performance">Performance</h2><span class="tag">estimated</span></header>
+    <div class="sec-b">
+      <div class="items c4">
+        <div class="item"><span class="k">Thrust to weight</span><span class="v">0.67</span><span class="d">Full pack at <span class="n">1380 g</span>; <span class="n">0.54</span> at mid pack</span></div>
+        <div class="item"><span class="k">Wing loading</span><span class="v">78<small>g/dm²</small></span><span class="d">Design target <span class="n">56 g/dm²</span></span></div>
+        <div class="item"><span class="k">Stall speed</span><span class="v">≈42<small>km/h</small></span><span class="d"><span class="n">11.6 m/s</span> at CL<sub>max</sub> 0.93</span></div>
+        <div class="item"><span class="k">Launch</span><span class="v">Bungee</span><span class="d">A hand launch needs more energy than an arm gives at this weight</span></div>
+      </div>
+      <p class="note">These figures use the model-measured weight, not the target. At the <span class="n">984 g</span> target the thrust-to-weight is about <span class="n">0.95</span>. The airflow in the 3D view is a simple model drawn around the CAD surfaces. It shows the flow pattern; it is not wind-tunnel or CFD data. Not flight-tested.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="printing" aria-labelledby="h-printing">
+    <header class="sec-h"><span class="no">06</span><h2 id="h-printing">Printing</h2><span class="tag">26 parts</span></header>
+    <div class="sec-b">
+      <div class="items c2">
+        <div class="item"><span class="k">Fuselage</span><span class="v">6 segments</span><span class="d">Printed standing up. The cuts avoid the spar box, the wing bolts and the fan socket, and the fan comes out with one segment.</span></div>
+        <div class="item"><span class="k">Wing</span><span class="v">4 panels + 2 tips</span><span class="d">Printed solid, spanwise, with 6% grid infill that stacks into vertical stringers, on a <span class="n">10 mm</span> carbon spar</span></div>
+        <div class="item"><span class="k">Ring frames</span><span class="v">5 × 2<small>mm</small></span><span class="d">At every fuselage cut they tie the duct to the skin and give a glue flange. Without them the duct would float loose inside the segments.</span></div>
+        <div class="item"><span class="k">Printer</span><span class="v">256<small>mm</small> bed</span><span class="d">Every part passes an automatic bed-fit check in the build, some only on the 45° diagonal</span></div>
+      </div>
+      <p class="note">Plain PLA, <span class="n">0.4 mm</span> nozzle, <span class="n">0.55 mm</span> line width to match the skin, 2 walls, no supports.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="verification" aria-labelledby="h-verification">
+    <header class="sec-h"><span class="no">07</span><h2 id="h-verification">CAD verification</h2></header>
+    <div class="sec-b">
+      <div class="items c4">
+        <div class="item"><span class="k">Bodies</span><span class="v">52</span><span class="d">In the Fusion 360 model</span></div>
+        <div class="item"><span class="k">Build</span><span class="v">23 phases</span><span class="d">About 7 minutes from an empty document</span></div>
+        <div class="item"><span class="k">Bed fit</span><span class="v">26 of 26</span><span class="d">Every printed part fits the 256 mm bed</span></div>
+        <div class="item"><span class="k">Mass audit</span><span class="v">In the build</span><span class="d">Real part volumes, not estimates, which is how the 40% overweight was caught</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="next" aria-labelledby="h-next">
+    <header class="sec-h"><span class="no">08</span><h2 id="h-next">Next steps</h2></header>
+    <div class="sec-b">
+      <ul class="todo">
+        <li class="done">Wing, tail, chin inlet, S-duct, fan bay and nozzle in CAD</li>
+        <li class="done">Controls, servos, spar, gear, hatches and wiring routes</li>
+        <li class="done">Split into 26 printed parts with an automatic bed-fit check</li>
+        <li>Cut the weight from about 1380 g back toward the 984 g target</li>
+        <li>Measure the fan's static thrust on a real 6S 1300 pack</li>
+        <li>Print, weigh, set the CG on the battery rail, then bungee launch</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<section class="cta" aria-label="Follow the build">
+  <div class="wrap cta-in">
+    <p><b>This airframe hasn't flown yet.</b> Follow the build on Instagram: prints, weigh-ins and the first launch as they happen.</p>
+    <a class="cta-btn" href="https://www.instagram.com/topsecret.aero/" target="_blank" rel="noopener">Follow @topsecret.aero</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span class="stamp">Top Secret Aero</span>
+    <p>EDF-X5 SPORT JET · rev. v15 · Nov 2026 · <a href="https://www.instagram.com/topsecret.aero/" target="_blank" rel="noopener">Instagram @topsecret.aero</a></p>
+  </div>
+</footer>
+
+<script>
+// Section nav: highlight the chip of the section in view and keep it scrolled into the chip row.
+(() => {
+  const links = Array.from(document.querySelectorAll('.secnav a'));
+  const row = document.querySelector('.secnav-in');
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  const byId = new Map(links.map(a => [a.hash.slice(1), a]));
+  const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const io = new IntersectionObserver(entries => {
+    for (const e of entries) {
+      const a = e.isIntersecting && byId.get(e.target.id);
+      if (!a || a.hasAttribute('aria-current')) continue;
+      links.forEach(l => l.removeAttribute('aria-current'));
+      a.setAttribute('aria-current', 'location');
+      row.scrollTo({ left: a.offsetLeft - (row.clientWidth - a.offsetWidth) / 2, behavior: smooth ? 'smooth' : 'auto' });
+    }
+  }, { rootMargin: '-35% 0px -60% 0px' });
+  document.querySelectorAll('.sheet .sec').forEach(s => io.observe(s));
+})();
+</script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const viewer = document.getElementById('viewer');
+const canvas = document.getElementById('scene');
+const loading = document.getElementById('loading');
+const hud = document.getElementById('hud');
+const hudT = document.getElementById('hud-t');
+const hudD = document.getElementById('hud-d');
+const flowTag = document.getElementById('flowtag');
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function fail(msg) { loading.textContent = msg; loading.hidden = false; }
+
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+} catch (e) {
+  fail('The 3D view needs WebGL, which is turned off in this browser.');
+  throw e;
+}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(30, 1, 10, 20000);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.enablePan = false;
+controls.minDistance = 450;
+controls.maxDistance = 6500;
+controls.autoRotateSpeed = 0.6;
+
+const key = new THREE.DirectionalLight(0xffffff, 2.4);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -900, right: 900, top: 900, bottom: -900, near: 50, far: 5000 });
+key.shadow.camera.updateProjectionMatrix();
+key.shadow.bias = -0.0004;
+key.shadow.normalBias = 1.5;
+scene.add(key, key.target);
+const rim = new THREE.DirectionalLight(0xdfe6ff, 1.9);
+scene.add(rim);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x0a0a0a, 0.35));
+
+// Paint as in Fusion: glossy white airframe, red control surfaces, tips and hatches, grey-tinted canopy,
+// dark nozzle, carbon spars, and the internals in the same colours as the other spec sheets.
+const gloss = { roughness: 0.32, metalness: 0.0, clearcoat: 0.8, clearcoatRoughness: 0.18 };
+const mat = {
+  skin:    new THREE.MeshPhysicalMaterial({ color: 0xeef0f2, ...gloss }),
+  red:     new THREE.MeshPhysicalMaterial({ color: 0xb3242c, ...gloss }),
+  win:     new THREE.MeshPhysicalMaterial({ color: 0x2a3038, roughness: 0.08, metalness: 0.2, clearcoat: 1, clearcoatRoughness: 0.05, transparent: true, opacity: 0.85 }),
+  nozzle:  new THREE.MeshPhysicalMaterial({ color: 0x2b2d31, roughness: 0.4, metalness: 0.3, clearcoat: 0.5 }),
+  housing: new THREE.MeshPhysicalMaterial({ color: 0x3a3d43, roughness: 0.35, metalness: 0.4 }),
+  battery: new THREE.MeshStandardMaterial({ color: 0xdcae22, roughness: 0.45 }),
+  esc:     new THREE.MeshStandardMaterial({ color: 0x2a6ad0, roughness: 0.4 }),
+  fc:      new THREE.MeshStandardMaterial({ color: 0x2f8f4e, roughness: 0.45 }),
+  servo:   new THREE.MeshStandardMaterial({ color: 0x1b1c1f, roughness: 0.5 }),
+  carbon:  new THREE.MeshPhysicalMaterial({ color: 0x1d1f22, roughness: 0.28, clearcoat: 0.9 }),
+  steel:   new THREE.MeshStandardMaterial({ color: 0xb9bdc4, roughness: 0.3, metalness: 0.9 }),
+  gearleg: new THREE.MeshStandardMaterial({ color: 0x2b2d31, roughness: 0.3, metalness: 0.7 }),
+  wheel:   new THREE.MeshStandardMaterial({ color: 0x161618, roughness: 0.8 }),
+};
+const AIRFRAME = new Set(['skin', 'red', 'win', 'nozzle']);
+
+function kind(n) {
+  if (n.startsWith('aileron') || n.startsWith('elevator') || n === 'rudder' || n.startsWith('wingtip') || n.startsWith('hatch') || n.startsWith('cover_ail')) return 'red';
+  if (n === 'canopy') return 'win';
+  if (n === 'nozzle') return 'nozzle';
+  if (n === 'edf_unit') return 'housing';
+  if (n.startsWith('mock_battery')) return 'battery';
+  if (n.startsWith('mock_esc')) return 'esc';
+  if (n.startsWith('mock_rx')) return 'fc';
+  if (n.startsWith('servo')) return 'servo';
+  if (n.startsWith('cf_') || n.startsWith('pr_') || n.startsWith('rod_')) return 'carbon';
+  if (n.startsWith('m3_')) return 'steel';
+  if (n.startsWith('wheel')) return 'wheel';
+  if (n.startsWith('gear')) return 'gearleg';
+  return 'skin';
+}
+
+const LABEL = {
+  fuselage: ['Fuselage', 'Printed in 6 segments, 0.55 mm PLA skin with ring frames at the cuts'],
+  wing: ['Wing panel', 'Printed solid with 6% grid infill; 27° sweep, 4% camber'],
+  wingtip: ['Wingtip', 'Separate printed tip'],
+  aileron: ['Aileron', 'On nylon hinges, servo in the wing'],
+  elevator: ['Elevator', 'One per side'],
+  rudder: ['Rudder', 'Trailing edge of the fin'],
+  htail: ['Tailplane', 'V_h 0.44, on a carbon rod'],
+  canopy: ['Canopy', 'Grey-tinted, printed as one part'],
+  hatch: ['Top hatch', 'Opens the bays along the spine'],
+  nozzle: ['Nozzle', 'Exit at 91% of the fan area'],
+  edf_unit: ['50 mm EDF', 'XFly Galaxy X5, 3200 KV on 6S'],
+  mock_battery: ['Battery', '6S 1300 mAh, on a sliding rail for the CG'],
+  mock_esc: ['ESC', '6S 60 A, no BEC'],
+  mock_rx: ['Receiver', ''],
+  servo: ['Servo', 'Four in all: two ailerons, elevator, rudder'],
+  cover_ail: ['Servo cover', 'Over the aileron servo'],
+  cf_spar: ['Main spar', '10 mm carbon tube through both wing panels'],
+  spar_box: ['Spar box', 'Carries the wing spar through the fuselage'],
+  m3: ['Wing bolt', 'M3, four in all'],
+  rod_htail: ['Tailplane rod', 'Carbon, joins the tailplane halves'],
+  pr: ['Pushrod', 'Carbon'],
+  gear: ['Landing gear', 'Fixed tricycle'],
+  wheel: ['Wheel', 'Foam'],
+};
+function labelFor(name) {
+  for (const key of Object.keys(LABEL).sort((a, b) => b.length - a.length)) if (name.startsWith(key)) return LABEL[key];
+  return [name, ''];
+}
+
+function bytes(b64) {
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out.buffer;
+}
+
+const group = new THREE.Group();
+scene.add(group);
+const shells = [];
+const rotors = [];
+const hinged = [];
+let sphere = null;
+const HERO = new THREE.Vector3(-0.72, 0.42, -0.55).normalize();
+
+// Frame the airframe itself, not its bounding sphere: a flat wing seen from above fills far less of the
+// screen than the sphere around it. fitPts holds every 5th airframe vertex.
+let fitPts = [];
+function fitDistance() {
+  const tv = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2) * 0.8, th = tv * camera.aspect;
+  const fwd = HERO.clone().negate();
+  const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0, 1, 0)).normalize();
+  const up = new THREE.Vector3().crossVectors(right, fwd);
+  const rel = new THREE.Vector3();
+  let d = 0;
+  for (const p of fitPts) {
+    rel.subVectors(p, sphere.center);
+    d = Math.max(d, rel.dot(HERO) + Math.max(Math.abs(rel.dot(right)) / th, Math.abs(rel.dot(up)) / tv));
+  }
+  return THREE.MathUtils.clamp(d, controls.minDistance, controls.maxDistance);
+}
+function resetView() {
+  if (!sphere) return;
+  controls.target.copy(sphere.center);
+  camera.position.copy(sphere.center).addScaledVector(HERO, fitDistance());
+  controls.update();
+}
+
+// ---------- airflow
+// Streamlines from webtools/flow_edf.py (adapted from the B-2 viewer): surface-following lines over and under the wing, wing-tip vortices,
+// and through-flow lines that enter the intakes, pass the fans and leave as jets along the exhaust trays.
+// Pulses travel along each line at the local flow speed (tau = time of flight), so they bunch up where the
+// air slows and stretch where it speeds up; the jets glow white.
+const FLOW_SPEED = 520;
+const flowU = {
+  uTime: { value: 100 },
+  uRes: { value: new THREE.Vector2(1, 1) },
+  uWidth: { value: 1.35 * renderer.getPixelRatio() },
+  uPeriod: { value: 260 },
+  uTail: { value: 0.42 },
+  uBase: { value: 0.06 },
+  uSlow: { value: new THREE.Vector3(0.16, 0.36, 1.0) },
+  uMid: { value: new THREE.Vector3(0.21, 0.78, 1.0) },
+  uFast: { value: new THREE.Vector3(0.92, 0.98, 1.0) },
+};
+const flowMat = new THREE.ShaderMaterial({
+  uniforms: flowU,
+  transparent: true,
+  depthWrite: false,
+  side: THREE.DoubleSide,
+  blending: THREE.AdditiveBlending,
+  vertexShader: `
+    attribute vec3 aPrev;
+    attribute vec3 aNext;
+    attribute float aSide;
+    attribute float aTau;
+    attribute float aSpd;
+    attribute float aFade;
+    uniform vec2 uRes;
+    uniform float uWidth;
+    varying float vTau;
+    varying float vSpd;
+    varying float vFade;
+    varying float vSide;
+    void main() {
+      mat4 pvm = projectionMatrix * modelViewMatrix;
+      vec4 c = pvm * vec4(position, 1.0);
+      vec4 a = pvm * vec4(aPrev, 1.0);
+      vec4 b = pvm * vec4(aNext, 1.0);
+      vec2 asp = vec2(uRes.x / uRes.y, 1.0);
+      vec2 d = (b.xy / b.w - a.xy / a.w) * asp;
+      float l = length(d);
+      d = l > 1e-6 ? d / l : vec2(1.0, 0.0);
+      c.xy += vec2(-d.y, d.x) / asp * aSide * uWidth / uRes.y * c.w;
+      gl_Position = c;
+      vTau = aTau; vSpd = aSpd; vFade = aFade; vSide = aSide;
+    }`,
+  fragmentShader: `
+    uniform float uTime;
+    uniform float uPeriod;
+    uniform float uTail;
+    uniform float uBase;
+    uniform vec3 uSlow;
+    uniform vec3 uMid;
+    uniform vec3 uFast;
+    varying float vTau;
+    varying float vSpd;
+    varying float vFade;
+    varying float vSide;
+    void main() {
+      float u = fract((uTime - vTau) / uPeriod);
+      float k = clamp(1.0 - u / uTail, 0.0, 1.0);
+      vec3 col = mix(uSlow, uMid, smoothstep(0.80, 1.0, vSpd));
+      col = mix(col, uFast, smoothstep(1.03, 1.30, vSpd));
+      col = mix(col, vec3(1.0), 0.5 * pow(k, 8.0));
+      float a = (uBase + (1.0 - uBase) * k * k) * vFade * (1.0 - smoothstep(0.45, 1.0, abs(vSide)));
+      gl_FragColor = vec4(col, a);
+    }`,
+});
+let flowMesh = null;
+
+function buildFlow(doc, floorY) {
+  const P = new Int16Array(bytes(doc.pos));
+  const T = new Uint16Array(bytes(doc.tau));
+  const S = new Uint8Array(bytes(doc.spd));
+  const F = doc.fade ? new Uint8Array(bytes(doc.fade)) : null;
+  const qp = doc.q_pos, qt = doc.q_tau;
+  const lines = [];
+  let first = 0;
+  doc.counts.forEach((n, li) => {
+    let ok = true;
+    for (let i = first; i < first + n && ok; i++) ok = P[i * 3 + 1] * qp > floorY + 6;
+    if (ok) lines.push([first, n, F ? F[li] / 255 : 1]);
+    first += n;
+  });
+  let nPts = 0, nSeg = 0;
+  for (const [, n] of lines) { nPts += n; nSeg += n - 1; }
+  const pos = new Float32Array(nPts * 6), prev = new Float32Array(nPts * 6), next = new Float32Array(nPts * 6);
+  const side = new Float32Array(nPts * 2), tau = new Float32Array(nPts * 2);
+  const spd = new Float32Array(nPts * 2), fade = new Float32Array(nPts * 2);
+  const index = new Uint32Array(nSeg * 6);
+  const put = (arr, v, j) => { arr[v * 3] = P[j * 3] * qp; arr[v * 3 + 1] = P[j * 3 + 1] * qp; arr[v * 3 + 2] = P[j * 3 + 2] * qp; };
+  let v = 0, e = 0;
+  for (const [s, n, lf] of lines) {
+    const tEnd = T[s + n - 1] * qt;
+    for (let i = 0; i < n; i++) {
+      const j = s + i, t = T[j] * qt;
+      const f = lf * Math.min(1, t / 60) * Math.min(1, Math.max(0, tEnd - t) / 90);
+      for (let k = 0; k < 2; k++, v++) {
+        put(pos, v, j);
+        put(prev, v, s + Math.max(i - 1, 0));
+        put(next, v, s + Math.min(i + 1, n - 1));
+        side[v] = k ? 1 : -1;
+        tau[v] = t;
+        spd[v] = S[j] / 100;
+        fade[v] = f;
+      }
+      if (i < n - 1) {
+        const a = v - 2;
+        index[e++] = a; index[e++] = v; index[e++] = a + 1;
+        index[e++] = a + 1; index[e++] = v; index[e++] = v + 1;
+      }
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('aPrev', new THREE.BufferAttribute(prev, 3));
+  g.setAttribute('aNext', new THREE.BufferAttribute(next, 3));
+  g.setAttribute('aSide', new THREE.BufferAttribute(side, 1));
+  g.setAttribute('aTau', new THREE.BufferAttribute(tau, 1));
+  g.setAttribute('aSpd', new THREE.BufferAttribute(spd, 1));
+  g.setAttribute('aFade', new THREE.BufferAttribute(fade, 1));
+  g.setIndex(new THREE.BufferAttribute(index, 1));
+  flowMesh = new THREE.Mesh(g, flowMat);
+  flowMesh.frustumCulled = false;
+  scene.add(flowMesh);
+}
+
+function loadFlow(floorY) {
+  fetch('flow.json')
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(doc => { buildFlow(doc, floorY); apply(); })
+    .catch(() => { btn.flow.hidden = true; flowTag.hidden = true; });
+}
+
+function resize() {
+  const w = viewer.clientWidth, h = viewer.clientHeight;
+  if (!w || !h) return;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.getDrawingBufferSize(flowU.uRes.value);
+}
+new ResizeObserver(resize).observe(viewer);
+resize();
+
+function addStage(box) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const g = c.getContext('2d');
+  const rg = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+  rg.addColorStop(0, '#1d1e22');
+  rg.addColorStop(0.5, '#0b0b0d');
+  rg.addColorStop(1, '#000000');
+  g.fillStyle = rg;
+  g.fillRect(0, 0, 256, 256);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const y = box.min.y - 2;
+  const disc = new THREE.Mesh(new THREE.CircleGeometry(1500, 96),
+    new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }));
+  disc.rotation.x = -Math.PI / 2;
+  disc.position.set(sphere.center.x, y, sphere.center.z);
+  const catcher = new THREE.Mesh(new THREE.CircleGeometry(1500, 96), new THREE.ShadowMaterial({ opacity: 0.6 }));
+  catcher.rotation.x = -Math.PI / 2;
+  catcher.position.set(sphere.center.x, y + 0.5, sphere.center.z);
+  catcher.receiveShadow = true;
+  scene.add(disc, catcher);
+}
+
+fetch('model.json')
+  .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+  .then(doc => {
+    for (const p of doc.parts) {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(bytes(p.pos)), 3));
+      geo.setAttribute('normal', new THREE.BufferAttribute(new Int8Array(bytes(p.nrm)), 3, true));
+      geo.setIndex(new THREE.BufferAttribute(p.idx32 ? new Uint32Array(bytes(p.idx)) : new Uint16Array(bytes(p.idx)), 1));
+      const k = kind(p.name);
+      const mesh = new THREE.Mesh(geo, mat[k]);
+      mesh.name = p.name;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      const rot = doc.rotors && doc.rotors[p.name];
+      if (rot) {
+        const c = new THREE.Vector3(...rot.c);
+        geo.translate(-c.x, -c.y, -c.z);
+        mesh.position.copy(c);
+        rotors.push({ mesh, dir: rot.dir });
+      }
+      // split drag rudders open like a clamshell: upper half trailing edge up, lower half down
+      const h = p.name.startsWith('DR_') && doc.hinges && doc.hinges[p.name];
+      if (h) {
+        const a = new THREE.Vector3(...h.a), b = new THREE.Vector3(...h.b);
+        geo.translate(-a.x, -a.y, -a.z);
+        mesh.position.copy(a);
+        const open = p.name.startsWith('DR_lo') ? -h.up : h.up;
+        hinged.push({ mesh, axis: b.sub(a).normalize(), target: THREE.MathUtils.degToRad(32) * open, cur: 0 });
+      }
+      if (AIRFRAME.has(k)) {
+        shells.push(mesh);
+        const a = geo.attributes.position;
+        for (let i = 0; i < a.count; i += 5) fitPts.push(new THREE.Vector3(a.getX(i), a.getY(i), a.getZ(i)).add(mesh.position));
+      }
+      group.add(mesh);
+    }
+    const box = new THREE.Box3().setFromObject(group);
+    sphere = box.getBoundingSphere(new THREE.Sphere());
+    key.position.copy(sphere.center).add(new THREE.Vector3(-650, 1600, 750));
+    key.target.position.copy(sphere.center);
+    rim.position.copy(sphere.center).add(new THREE.Vector3(1400, 550, -950));
+    addStage(box);
+    resetView();
+    loading.hidden = true;
+    loadFlow(box.min.y - 2);
+  })
+  .catch(() => fail("Couldn't load the 3D model. Reload the page to try again."));
+
+// ---------- controls
+const state = { flow: true, xray: false, rotate: !reduce };
+const btn = {
+  flow: document.getElementById('btn-flow'),
+  xray: document.getElementById('btn-xray'),
+  rotate: document.getElementById('btn-rotate'),
+};
+function apply() {
+  for (const k of AIRFRAME) {
+    const m = mat[k];
+    m.transparent = state.xray || k === 'win';
+    m.opacity = state.xray ? 0.14 : (k === 'win' ? 0.85 : 1);
+    m.depthWrite = !state.xray;
+    m.needsUpdate = true;
+  }
+  shells.forEach(s => { s.castShadow = !state.xray; });
+  controls.autoRotate = state.rotate;
+  if (flowMesh) flowMesh.visible = state.flow;
+  flowTag.hidden = !(state.flow && flowMesh);
+  for (const k of Object.keys(btn)) btn[k].setAttribute('aria-pressed', String(state[k]));
+}
+for (const k of Object.keys(btn)) btn[k].addEventListener('click', () => { state[k] = !state[k]; apply(); });
+document.getElementById('btn-reset').addEventListener('click', resetView);
+apply();
+
+// ---------- part names
+const ray = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+function showLabel(name) {
+  if (!name) { hud.hidden = true; return; }
+  const [t, d] = labelFor(name);
+  hudT.textContent = t;
+  hudD.textContent = d;
+  hud.hidden = false;
+}
+function pick(x, y) {
+  if (!group.children.length) return;
+  const r = canvas.getBoundingClientRect();
+  ndc.set(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const targets = state.xray ? group.children.filter(o => !shells.includes(o)) : group.children;
+  const hit = ray.intersectObjects(targets, false)[0];
+  showLabel(hit ? hit.object.name : null);
+}
+let pending = null, down = null;
+canvas.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse' || e.buttons !== 0) return;
+  if (!pending) requestAnimationFrame(() => { pick(pending.x, pending.y); pending = null; });
+  pending = { x: e.clientX, y: e.clientY };
+});
+canvas.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; });
+canvas.addEventListener('pointerup', e => {
+  if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 6) pick(e.clientX, e.clientY);
+  down = null;
+});
+canvas.addEventListener('pointerleave', () => showLabel(null));
+
+// ---------- loop
+const clock = new THREE.Clock();
+const SPIN = Math.PI * 2 * 1.6;
+const q = new THREE.Quaternion();
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  for (const hg of hinged) {
+    const goal = state.deflect ? hg.target : 0;
+    hg.cur += (goal - hg.cur) * (reduce ? 1 : Math.min(1, dt * 4));
+    hg.mesh.quaternion.copy(q.setFromAxisAngle(hg.axis, hg.cur));
+  }
+  if (state.flow && !reduce) flowU.uTime.value = (flowU.uTime.value + FLOW_SPEED * dt) % flowU.uPeriod.value;
+  controls.update();
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
