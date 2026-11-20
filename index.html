@@ -153,6 +153,7 @@ section.sec { padding-block: 88px; }
 .book { display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; align-items: center; padding: 48px; border-radius: 28px; border: 1px solid var(--line);
   background: radial-gradient(80% 120% at 0% 0%, rgba(63,169,245,.18), transparent 60%), var(--card); }
 .cover { aspect-ratio: 3/4; width: 100%; max-width: 270px; border-radius: 14px; background: linear-gradient(160deg, #0f2a44, #05080d 70%); border: 1px solid #1d3a57; padding: 24px 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 30px 60px rgba(0,0,0,.55), 0 0 60px rgba(63,169,245,.15); transform: rotate(-3deg); }
+.cover-img { display: block; aspect-ratio: 5/8; height: auto; padding: 0; object-fit: cover; border-color: #2a5a8a; }
 .cover small { font: 500 10px var(--mono); letter-spacing: .22em; color: var(--accent); text-transform: uppercase; }
 .cover strong { font: 700 34px/1 var(--display); }
 .cover span { font: 12px var(--mono); color: var(--muted); }
@@ -344,7 +345,7 @@ footer a { color: var(--muted); }
   <div class="wrap">
     <div class="sec-h reveal"><span>03</span><h2>Do it yourself</h2></div>
     <div class="book reveal">
-      <div class="cover" aria-hidden="true"><small>Claude × Fusion 360</small><strong>Field<br>Manual</strong><span>@topsecret.aero</span></div>
+      <img class="cover cover-img" src="img/fieldmanual-cover.jpg" alt="Claude × Fusion 360 Field Manual cover" width="800" height="1280" loading="lazy">
       <div>
         <h3>Want Claude to do this with your own designs?</h3>
         <p>The Field Manual is the exact setup behind every build on this page.</p>
