@@ -154,6 +154,8 @@ section.sec { padding-block: 88px; }
   background: radial-gradient(80% 120% at 0% 0%, rgba(63,169,245,.18), transparent 60%), var(--card); }
 .cover { aspect-ratio: 3/4; width: 100%; max-width: 270px; border-radius: 14px; background: linear-gradient(160deg, #0f2a44, #05080d 70%); border: 1px solid #1d3a57; padding: 24px 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 30px 60px rgba(0,0,0,.55), 0 0 60px rgba(63,169,245,.15); transform: rotate(-3deg); }
 .cover-img { display: block; aspect-ratio: 5/8; height: auto; padding: 0; object-fit: cover; border-color: #2a5a8a; }
+.cover-img.sq { aspect-ratio: 1/1; max-width: 320px; border-color: #3a3a3a; box-shadow: 0 30px 60px rgba(0,0,0,.55), 0 0 60px rgba(217,89,38,.14); }
+.book + .book { margin-top: 20px; }
 .cover small { font: 500 10px var(--mono); letter-spacing: .22em; color: var(--accent); text-transform: uppercase; }
 .cover strong { font: 700 34px/1 var(--display); }
 .cover span { font: 12px var(--mono); color: var(--muted); }
@@ -193,7 +195,7 @@ footer a { color: var(--muted); }
     <a class="logo" href="#top"><img src="img/logo-64.png" alt="" width="30" height="30">Top Secret Drone &amp; AI Lab</a>
     <ul>
       <li><a href="#builds">Builds</a></li>
-      <li><a href="#ebook">Ebook</a></li>
+      <li><a href="#ebook">Ebooks</a></li>
       <li><a href="https://www.instagram.com/topsecret.aero/" target="_blank" rel="noopener">Instagram</a></li>
     </ul>
   </div>
@@ -316,7 +318,7 @@ footer a { color: var(--muted); }
         <img src="img/cfd/naca_inlet.jpg" alt="Close-up of the flush NACA inlet in the flow model" loading="lazy" width="1600" height="538">
         <figcaption>NACA inlet in the flow model</figcaption>
       </figure>
-      <p class="cfdnote">Every click in the CFD software was Claude's. <a href="https://fastestquad.vercel.app/#cfd" target="_blank" rel="noopener">Full CFD results</a></p>
+      <p class="cfdnote">Every click in the CFD software was Claude's. <a href="https://fastestquad.vercel.app/#cfd" target="_blank" rel="noopener">Full CFD results</a> · <a href="https://kimhyunseok.gumroad.com/l/claude-autodeskcdf" target="_blank" rel="noopener">How to do it yourself</a></p>
     </div>
 
     <div class="grid">
@@ -341,6 +343,20 @@ footer a { color: var(--muted); }
           <li>How to get CAD work done just by asking</li>
         </ul>
         <a class="btn primary" href="https://kimhyunseok.gumroad.com/l/fieldmanual" target="_blank" rel="noopener">Get the Field Manual</a>
+      </div>
+    </div>
+    <div class="book reveal">
+      <img class="cover cover-img sq" src="img/cfd-manual-cover.jpg" alt="Claude × Autodesk CFD Field Manual + Skill cover: a wind tunnel you run by asking" width="600" height="600" loading="lazy">
+      <div>
+        <h3>New: a wind tunnel you run by asking</h3>
+        <p>Claude × Autodesk CFD is the field manual and skill behind the CFD on this page.</p>
+        <ul class="ticks">
+          <li>Have Claude set up, mesh and solve Autodesk CFD studies</li>
+          <li>Read drag and airflow straight from the results</li>
+          <li>Worked example: the SPEED-QUAD at 300 km/h</li>
+          <li>Comes with the Claude skill, ready to install</li>
+        </ul>
+        <a class="btn primary" href="https://kimhyunseok.gumroad.com/l/claude-autodeskcdf" target="_blank" rel="noopener">Get Claude × Autodesk CFD</a>
       </div>
     </div>
   </div>
