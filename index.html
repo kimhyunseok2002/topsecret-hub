@@ -421,13 +421,40 @@ var DEFS = {
   sq: {
     file: 'models/sq.js', hero: [-0.70, 0.45, -0.55], dist: 1.0,
     mats: { shell: phys(0xeef1f5, .34, 1), hatch: phys(0x2b3340, .42, .8), bell: std(0x3FA9F5, .28, .85), base: std(0x19191b, .6), copper: std(0xc8804a, .3, 1),
-      prop: phys(0x15171b, .3, .7), esc: std(0x2a6ad0, .4), battery: std(0xdcae22, .45), fc: std(0x2f8f4e, .45), dark: std(0x4a4d53, .5) },
-    xray: ['shell', 'hatch'], inner: ['battery', 'fc', 'esc_4in1', 'camera', 'gps', 'vtx', 'rx', 'xt60'], lift: 'hatch',
-    kind: function (n) { return n === 'hatch' ? 'hatch' : (n === 'main_body' || n === 'nose_cone' || n === 'tail_cone' || n.indexOf('nac_tail') === 0) ? 'shell'
-      : n.indexOf('motor_bell') === 0 ? 'bell' : n.indexOf('motor_base') === 0 ? 'base' : n.indexOf('motor_stator') === 0 ? 'copper'
-      : n.indexOf('prop_') === 0 ? 'prop' : n.indexOf('esc') === 0 ? 'esc' : n === 'battery' ? 'battery' : n === 'fc' ? 'fc' : 'dark'; },
-    names: { main_body: 'Main body', nose_cone: 'Nose cone', tail_cone: 'Tail cone', hatch: 'Top hatch', nac_tail: 'Nacelle tail cone', motor_bell: '2207 motor', motor_stator: 'Stator',
-      motor_base: 'Motor base', prop: '5×5 prop', esc_4in1: '4-in-1 ESC', battery: '6S 1300 mAh battery', fc: 'Flight controller', gps: 'GPS', vtx: 'Video transmitter', rx: 'Receiver', xt60: 'XT60', camera: 'FPV camera' }
+      prop: phys(0x15171b, .3, .7), esc: std(0x2a6ad0, .4), battery: std(0xdcae22, .45), fc: std(0x2f8f4e, .45), dark: std(0x4a4d53, .5),
+      printed: std(0x8f959d, .55), pcb: std(0x15161a, .6), metal: std(0xb9bdc4, .3, .9), gold: std(0xd4a64a, .25, 1), white: std(0xe8e6df, .6),
+      wire: std(0x2b2d31, .5), wireRed: std(0xc0262f, .45), xt60: std(0xe3b51f, .4), camera: phys(0x141416, .3, .6) },
+    xray: ['shell', 'hatch'], lift: 'hatch',
+    inner: ['battery', 'bat_label', 'bat_lead_p', 'bat_lead_n', 'bat_balance', 'xt60', 'xt60_cups', 'esc_lead_p', 'esc_lead_n', 'stack_tray', 'gps_mount',
+      'esc_pcb', 'esc_fets', 'esc_chips', 'esc_conn', 'esc_pads', 'cap', 'fc_pcb', 'fc_chips', 'fc_usb', 'fc_conn', 'fc_pads', 'grommets', 'spacers',
+      'stack_screws', 'stack_nuts', 'tray_screws', 'gps_shield', 'gps_pcb', 'gps_patch', 'gps_patch_top', 'gps_conn', 'cam_case', 'cam_lens', 'cam_glass',
+      'cam_conn', 'vtx_pcb', 'vtx_shield', 'vtx_mmcx', 'vtx_antenna', 'rx_pcb', 'rx_chip', 'rx_ufl', 'rx_antenna'],
+    kind: function (n) {
+      if (n === 'hatch') return 'hatch';
+      if (n === 'main_body' || n === 'nose_cone' || n === 'tail_cone' || n.indexOf('nac_tail') === 0) return 'shell';
+      if (n === 'stack_tray' || n === 'gps_mount') return 'printed';
+      if (n.indexOf('motor_bell') === 0 || n.indexOf('prop_nut') === 0) return 'bell';
+      if (n.indexOf('motor_base') === 0) return 'base';
+      if (n.indexOf('motor_stator') === 0) return 'copper';
+      if (n.indexOf('motor_wires') === 0) return 'wire';
+      if (n.indexOf('motor_screws') === 0 || /^(stack_screws|stack_nuts|tray_screws|fc_usb|gps_shield|vtx_shield|cap|gps_patch_top)$/.test(n)) return 'metal';
+      if (n.indexOf('prop_') === 0) return 'prop';
+      if (n === 'esc_pcb') return 'esc';
+      if (n === 'fc_pcb' || n === 'gps_pcb') return 'fc';
+      if (/^(esc_pads|fc_pads|xt60_cups|vtx_mmcx|rx_ufl)$/.test(n)) return 'gold';
+      if (/_conn$/.test(n) || n === 'bat_balance' || n === 'spacers') return 'white';
+      if (n === 'battery') return 'battery';
+      if (/_lead_p$/.test(n)) return 'wireRed';
+      if (/_lead_n$/.test(n)) return 'wire';
+      if (n === 'xt60') return 'xt60';
+      if (n.indexOf('cam_') === 0 || /antenna$/.test(n)) return 'camera';
+      if (n === 'vtx_pcb' || n === 'rx_pcb' || n === 'esc_fets' || /_chips?$/.test(n) || n === 'grommets' || n === 'bat_label') return 'pcb';
+      return 'dark'; },
+    names: { main_body: 'Main body', nose_cone: 'Nose cone', tail_cone: 'Tail cone', hatch: 'Top hatch', nac_tail: 'Nacelle tail cone', stack_tray: 'Stack tray',
+      gps_mount: 'GPS mount', motor_bell: 'F60 PRO V motor', motor_stator: 'Stator', motor_base: 'Motor base', motor_screws: 'Motor screws', motor_wires: 'Motor leads',
+      prop: '5152 prop', prop_nut: 'Prop nut', esc: '70 A 4-in-1 ESC', cap: 'Capacitor', fc: 'Flight controller', gps: 'GPS', grommets: 'Grommets', spacers: 'Spacers',
+      stack: 'Stack hardware', tray: 'Tray screws', battery: '6S 1300 mAh battery', bat_label: '6S 1300 mAh battery', bat: 'Battery leads', esc_lead: 'ESC power leads', xt60: 'XT60', cam: 'FPV camera', vtx: 'Video transmitter',
+      rx: 'Receiver' }
   },
   b2: {
     file: 'models/b2.js', hero: [-0.72, 0.42, -0.55], dist: 1.2,
